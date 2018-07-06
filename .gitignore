@@ -4,4 +4,5 @@ obj
 *.suo
 App_Data
 *.results.xml
-/packages
+packages
+.vs
