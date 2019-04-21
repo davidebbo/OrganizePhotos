@@ -13,14 +13,30 @@ namespace OrganizePhotos
             foreach (string file in Directory.EnumerateFiles(folder, "*.jpg"))
             {
                 DateTime dateTime;
-                using (var reader = new ExifReader(file))
+                try
                 {
-                    if (!reader.GetTagValue(ExifTags.DateTimeOriginal, out dateTime)) continue;
+                    using (var reader = new ExifReader(file))
+                    {
+                        if (!reader.GetTagValue(ExifTags.DateTimeOriginal, out dateTime)) continue;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Couldn't process file '{file}'. {e.Message}");
+                    continue;
                 }
 
                 string subFolder = Path.Combine(folder, dateTime.ToString("yyyy-MM-dd"));
                 Directory.CreateDirectory(subFolder);
-                File.Move(file, Path.Combine(subFolder, Path.GetFileName(file)));
+                string target = Path.Combine(subFolder, Path.GetFileName(file));
+                try
+                {
+                    File.Move(file, target);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Couldn't move file '{file}' to '{target}'. {e.Message}");
+                }
             }
         }
     }
